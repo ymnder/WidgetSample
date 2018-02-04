@@ -4,7 +4,6 @@ import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -14,12 +13,12 @@ import android.widget.EditText
  */
 class NewAppWidgetConfigureActivity : Activity() {
     internal var mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
-    internal var mAppWidgetText: EditText
+    internal var mAppWidgetText: EditText? = null
     internal var mOnClickListener: View.OnClickListener = View.OnClickListener {
         val context = this@NewAppWidgetConfigureActivity
 
         // When the button is clicked, store the string locally
-        val widgetText = mAppWidgetText.text.toString()
+        val widgetText = mAppWidgetText?.text.toString()
         saveTitlePref(context, mAppWidgetId, widgetText)
 
         // It is the responsibility of the configuration activity to update the app widget
@@ -58,7 +57,7 @@ class NewAppWidgetConfigureActivity : Activity() {
             return
         }
 
-        mAppWidgetText.setText(loadTitlePref(this@NewAppWidgetConfigureActivity, mAppWidgetId))
+        mAppWidgetText?.setText(loadTitlePref(this@NewAppWidgetConfigureActivity, mAppWidgetId))
     }
 
     companion object {
