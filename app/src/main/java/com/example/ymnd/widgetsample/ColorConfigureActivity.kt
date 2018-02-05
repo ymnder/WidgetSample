@@ -89,7 +89,7 @@ class ColorConfigureActivity : AppCompatActivity() {
 
         override fun onDismiss(dialog: DialogInterface?) {
             super.onDismiss(dialog)
-            (activity as ColorConfigureActivity).dismiss()
+            (activity as? ColorConfigureActivity)?.dismiss()
         }
     }
 
