@@ -58,7 +58,7 @@ class NewAppWidget : AppWidgetProvider() {
             // Construct the RemoteViews object
             val views = RemoteViews(context.packageName, R.layout.new_app_widget)
             views.setTextViewText(R.id.appwidget_text, widgetText)
-            views.setTextColor(R.id.appwidget_text, Color.GREEN)
+            views.setTextColor(R.id.appwidget_text, if (widgetColor == R.color.colorWhite) Color.BLACK else Color.WHITE)
             views.setInt(R.id.widget_layout, "setBackgroundColor", context.resources.getColor(widgetColor))
 
             // Instruct the widget manager to update the widget

@@ -60,7 +60,7 @@ class ColorConfigureActivity : AppCompatActivity() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val mAppWidgetId = arguments.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
 
-            val items = arrayOf(BackGroundColor.BLACK.label, BackGroundColor.WHITE.label)
+            val items = arrayOf(BackGroundColor.BLACK.label, BackGroundColor.WHITE.label, BackGroundColor.LIGHT_BLUE.label)
             val defaultItem = BackGroundColor.BLACK.order
             val checkedItems = arrayListOf<Int>()
             checkedItems.add(defaultItem)
@@ -95,7 +95,8 @@ class ColorConfigureActivity : AppCompatActivity() {
 
     enum class BackGroundColor(val order: Int, val label: String, val color: Int) {
         BLACK(0, "黒色", R.color.colorBlack),
-        WHITE(1, "白色", R.color.colorWhite);
+        WHITE(1, "白色", R.color.colorWhite),
+        LIGHT_BLUE(2, "デフォルト", R.color.colorLightBlue);
 
         companion object {
             @ColorRes
