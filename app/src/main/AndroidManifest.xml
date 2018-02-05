@@ -27,7 +27,8 @@
                 android:resource="@xml/new_app_widget_info" />
         </receiver>
 
-        <activity android:name=".NewAppWidgetConfigureActivity">
+        <activity android:name=".ColorConfigureActivity"
+            android:theme="@style/TransParentTheme">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
