@@ -459,11 +459,11 @@ if (widgetManager.isRequestPinAppWidgetSupported) {
 ```
 
 ### 解説
-widgetManager.isRequestPinAppWidgetSupported
-DefaultLauncherでWidgetリクエストが使用できるかをチェックする
-Android O(API 26)から追加された
-requestPinAppWidgetの方でも対応しているかを確認できるが
-これを使うことで対応しているかを実行前に確認できる
+- widgetManager.isRequestPinAppWidgetSupported
+- DefaultLauncherでWidgetリクエストが使用できるかをチェックする
+- Android O(API 26)から追加された
+- requestPinAppWidgetの方でも対応しているかを確認できるが
+- これを使うことで対応しているかを実行前に確認できる
 
 ### 解説
 `val callbackIntent = Intent(this, SubActivity::class.java)`
@@ -509,8 +509,9 @@ extras.putParcelable(EXTRA_APPWIDGET_PREVIEW, remoteViews)
 - trueの場合、requestPinAppWidgetに対応している意味である
 - これはWidgetが追加できたことを意味しない
 - successCallbackはnullでも良い。ただその場合、追加時に何も起きない
+
 - 現在使用しているランチャーにWidgetを追加するリクエストダイアログを呼び出す
-- ForegroundなActivity／Serviceから呼ばないと例外が出て落ちる          
+ForegroundなActivity／Serviceから呼ばないと例外が出て落ちる          
 
 ## requestPinAppWidgetでWidgetの配置に失敗したらどうなるか
 - requestPinAppWidgetはWidgetの作成成功時にしかsuccessCallbackを呼ばない
@@ -526,14 +527,14 @@ extras.putParcelable(EXTRA_APPWIDGET_PREVIEW, remoteViews)
 - 多くのアプリが端末にインストールされている今だからホームの特等地をとれるWidgetを！！
 
 # whoami
-twitter:@ymnd, github:@ymnder
-Application Enginner
-    Android日経電子版アプリ
-    Android紙面ビューアーアプリ
-  
-技術書典４で日経の内製の知見をまとめた本出します。
+- twitter:@ymnd, github:@ymnder
+- Application Enginner
+    - Android日経電子版アプリ
+    - Android紙面ビューアーアプリ
+- 技術書典４で日経電子版の知見をまとめた本を出します。
 
 # Appendix
+
 ## How to Calculate minWidth and minHeight
 WidgetのminWidth/minHeightは如何にして算出するか？
 [算出方法](https://developer.android.com/guide/practices/ui_guidelines/widget_design.html#anatomy_determining_size)
@@ -546,12 +547,10 @@ minHeight = 70 x 1 - 30 = 40
 minWidth = 70 x 2 -30 = 110
 ```
 
-※API14以前で推奨されていた計算方法がアップデートされました！
-
-[bounding box > frame > widget controlsの図]
-
-targetSDKがAPI14以上の場合、ホーム画面のウィジェットの各端にマージンが自動的に追加されます。
-そのため、Android4.0以上ではwidgetに予め余白を追加する必要はありません。
+## How to Calculate minWidth and minHeight
+- API14以前で推奨されていた計算方法がアップデートされた！
+- targetSDKがAPI14以上の場合、ホーム画面のウィジェットの各端にマージンが自動的に追加される
+- そのため、Android4.0以上ではwidgetに予め余白を追加する必要はない
 ```
 @Deprecated
 74 × cell - 2 = size
@@ -562,13 +561,9 @@ targetSDKがAPI14以上の場合、ホーム画面のウィジェットの各端
 - コンテクストを考えるとフルスクリーンよりダイアログで選択してもらう
 - セットアップ後はWidgetには設定用のボタンを表示しない
 
-## 公式のDocumentはUpdateされてる
-是非ご一読ください:))
-https://developer.android.com/guide/topics/appwidgets/index.html
-
 ## how is appWidgetId created?
-appWidgetIdはWidgetを更新するときに用いるID
-ユニークであるはずだけど、このIDがどのように振られているかが気になる
+- appWidgetIdはWidgetを更新するときに用いるID
+- ユニークであるはずだけど、このIDがどのように振られているかが気になる
 
 ```
 intentにはこのKeyで詰められている
@@ -605,66 +600,53 @@ http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/appwidget
 
 ### どのように番号が振られるか？
 `private final SparseIntArray mNextAppWidgetIds = new SparseIntArray();`
+`final int appWidgetId = peekNextAppWidgetIdLocked(userId) + 1;`
+`return mNextAppWidgetIds.get(userId);`
+
 mNextAppWidgetIdsには番号が格納されている
 これは、{userId, appWidgetId}のKey,Valueで保存される
-読み出した後、+1して格納するというインクリメント処理が行われている
-`final int appWidgetId = peekNextAppWidgetIdLocked(userId) + 1;`
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/appwidget/java/com/android/server/appwidget/AppWidgetServiceImpl.java#incrementAndGetAppWidgetIdLocked
-`return mNextAppWidgetIds.get(userId);`
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/appwidget/java/com/android/server/appwidget/AppWidgetServiceImpl.java#peekNextAppWidgetIdLocked
+読み出した後、+1して格納するという[インクリメント処理](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/appwidget/java/com/android/server/appwidget/AppWidgetServiceImpl.java#incrementAndGetAppWidgetIdLocked
+)が行われている
 
 ### どのように番号が振られるか？
-AppWidgetServiceImplはServiceクラスであり、他のアプリからもアクセスされる
-mNextAppWidgetIdsは他のアプリと共有されている
-
-結論：ユニークだけど、特に何か値を生成しているわけでもない。
-
-取得したい場合はこのメソッドを使えば取得できる
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/core/java/android/appwidget/AppWidgetManager.java#getAppWidgetIds
+- 結論：ユニークだけど、特別な値を生成しているわけでもない。
+- AppWidgetServiceImplはServiceクラスであり、他のアプリからもアクセスされる
+- mNextAppWidgetIdsは他のアプリと共有されている
+- 取得したい場合は[このメソッド](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/core/java/android/appwidget/AppWidgetManager.java#getAppWidgetIds)を使えば取得できる
 
 ## requestPinAppWidget & isRequestPinAppWidgetSupportedの返り値
-isRequestPinAppWidgetSupported
-updateAppWidget
-はそれぞれbooleanを返すが、これにはどんな違いがあるのか
-
-上はReturn {@code TRUE} if the default launcher supports
-下は{@code TRUE} if the launcher supports this feature. Note the API will return without
+- isRequestPinAppWidgetSupported
+    - Return {@code TRUE} if the default launcher supports
+- updateAppWidget
+    - {@code TRUE} if the launcher supports this feature. Note the API will return without
     waiting for the user to respond, so getting {@code TRUE} from this API does *not* mean
     the shortcut is pinned. {@code FALSE} if the launcher doesn't support this feature.
-???
+- それぞれbooleanを返すが、これにはどんな違いがあるのか
 
 ### isRequestPinAppWidgetSupportedの返り値
-
-isRequestPinAppWidgetSupported
-ー＞AppWidgetServiceImpl.java#isRequestPinAppWidgetSupported
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/appwidget/java/com/android/server/appwidget/AppWidgetServiceImpl.java#isRequestPinAppWidgetSupported
-ー＞ShortcutService.java#isRequestPinItemSupported
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#isRequestPinItemSupported
-ー＞ShortcutRequestPinProcessor.java#isRequestPinItemSupported
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#isRequestPinItemSupported
-ー＞ShortcutRequestPinProcessor.java#getRequestPinConfirmationActivity
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#getRequestPinConfirmationActivity
-ShortcutService.java#getRequestPinConfirmationActivity
+- isRequestPinAppWidgetSupported
+- [AppWidgetServiceImpl.java#isRequestPinAppWidgetSupported](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/appwidget/java/com/android/server/appwidget/AppWidgetServiceImpl.java#isRequestPinAppWidgetSupported)
+- [ShortcutService.java#isRequestPinItemSupported](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#isRequestPinItemSupported)
+- [ShortcutRequestPinProcessor.java#isRequestPinItemSupported](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#isRequestPinItemSupported)
+- [ShortcutRequestPinProcessor.java#getRequestPinConfirmationActivity](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#getRequestPinConfirmationActivity)
+- ShortcutService.java#getRequestPinConfirmationActivity
 
 ### ShortcutService.java#getRequestPinConfirmationActivity 
 > Find the activity that handles {@link LauncherApps#ACTION_CONFIRM_PIN_SHORTCUT} in thedefault launcher.
 
-ここでdefault launcherから機能がハンドルされているActivityを探している
-取得できなかった場合はnullを返す
-これがnullであればfalseを返しており、これが非対応という判定を下している。
+- ここでdefault launcherから機能がハンドルされているActivityを探している
+- 取得できなかった場合はnullを返す
+- これがnullであればfalseを返しており、これが非対応という判定を下している。
 
 ### requestPinAppWidgetの返り値
 AppWidgetManager
-ー＞AppWidgetServiceImpl
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/appwidget/java/com/android/server/appwidget/AppWidgetServiceImpl.java#requestPinAppWidget
-ー＞ShortcutService#requestPinAppWidget
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#requestPinAppWidget
-ー＞ShortcutService.java#requestPinItem
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#requestPinItem
-ー＞ShortcutRequestPinProcessor.java#requestPinItemLocked
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#requestPinItemLocked
-ShortcutService.java#getRequestPinConfirmationActivity
+- [AppWidgetServiceImpl](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/appwidget/java/com/android/server/appwidget/AppWidgetServiceImpl.java#requestPinAppWidget)
+- [ShortcutService#requestPinAppWidget](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#requestPinAppWidget)
+- [ShortcutService.java#requestPinItem](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#requestPinItem)
+- [ShortcutRequestPinProcessor.java#requestPinItemLocked](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#requestPinItemLocked)
+- ShortcutService.java#getRequestPinConfirmationActivity
 
+### requestPinAppWidgetの返り値
 ここでdefault launcherから機能がハンドルされているActivityを探している
 結果的にisRequestPinAppWidgetSupportedと同じ判定を行っている
 ただ、もしtrueだった場合はそのままrequest処理が進んでいく
@@ -680,12 +662,9 @@ ShortcutService.java#getRequestPinConfirmationActivity
 
 ### callbackはどこで呼ばれるか？
 ■AppWidgetManager
-ー＞AppWidgetServiceImpl
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/appwidget/java/com/android/server/appwidget/AppWidgetServiceImpl.java#requestPinAppWidget
-ー＞ShortcutService#requestPinAppWidget
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#requestPinAppWidget
-ー＞ShortcutService.java#requestPinItem
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#requestPinItem
+- [AppWidgetServiceImpl](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/appwidget/java/com/android/server/appwidget/AppWidgetServiceImpl.java#requestPinAppWidget)
+- [ShortcutService#requestPinAppWidget](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#requestPinAppWidget)
+- [ShortcutService.java#requestPinItem](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#requestPinItem)
 
 ### ShortcutService.java#requestPinItem
 このメソッドはShortcutの方からも呼ばれている
@@ -699,21 +678,14 @@ requestPinItemLocked(ShortcutInfo inShortcut,
 ```
 
 ### callbackはどのタイミングで呼ばれるか？
-ー＞LauncherApps.java#PinItemRequest
-成功時にacceptを呼ぶ
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/core/java/android/content/pm/LauncherApps.java#PinItemRequest
-ー＞ShortcutRequestPinProcessor.java#PinAppWidgetRequestInner
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#PinAppWidgetRequestInner
-ー＞ShortcutRequestPinProcessor.java#PinItemRequestInner
-ここでacceptの中身が実装されている
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#PinItemRequestInner
-ー＞ShortcutRequestPinProcessor.java#directPinShortcut
-終点：例外をキャッチしていて、作成できなかった場合はfalseを返す：tryAcceptがfalseになり、コールバックが実行されない
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#directPinShortcut
-ー＞ShortcutService.java#fixUpIncomingShortcutInfo
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#fixUpIncomingShortcutInfo
-※Toastメッセージはこのメソッドである
-http://tools.oesf.biz/android-8.0.0_r1.0/xref/packages/apps/Launcher2/src/com/android/launcher2/Launcher.java#showOutOfSpaceMessage
+- [LauncherApps.java#PinItemRequest](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/core/java/android/content/pm/LauncherApps.java#PinItemRequest)
+  - 成功時にacceptを呼ぶ
+- [ShortcutRequestPinProcessor.java#PinAppWidgetRequestInner](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#PinAppWidgetRequestInner)
+- [ShortcutRequestPinProcessor.java#PinItemRequestInner](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#PinItemRequestInner)
+  - ここでacceptの中身が実装されている
+- [ShortcutRequestPinProcessor.java#directPinShortcut](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutRequestPinProcessor.java#directPinShortcut)
+  - 終点：例外をキャッチしていて、作成できなかった場合はfalseを返す：tryAcceptがfalseになり、コールバックが実行されない
+- [ShortcutService.java#fixUpIncomingShortcutInfo](http://tools.oesf.biz/android-8.0.0_r1.0/xref/frameworks/base/services/core/java/com/android/server/pm/ShortcutService.java#fixUpIncomingShortcutInfo)
 
 ### callbackはどのタイミングで呼ばれるか？（終点）
 ```
@@ -731,3 +703,6 @@ if (tryAccept()) {
 - 失敗時は何もされない。falseが返るだけ。
 
 
+## Further reading
+- 是非ご一読ください:))
+https://developer.android.com/guide/topics/appwidgets/index.html
